@@ -24,14 +24,25 @@ server.tool("create-user", "Create a new user in the database", {
   readOnlyHint: false,
   destructiveHint: false,
   idempotentHint: false,
-  openWorldHint: true,
-} async () => {
-  console.log("Creating user");
-  return {
-    success: true,
-    message: "User created successfully"
-  }
-}
+  openWorldHint: true
+}, async (params) => {
+  console.log(params);
+  try {
+    const id = await createUser(params);
+    return {
+      content: [{
+        type: "text",
+        text: `User {$id}created successfully`
+      }]
+    }
+  } catch {
+    return {
+      content: [{
+        type: "text",
+        text: "User creation failed"
+      }]
+    }
+    }
 })
 
 async function main() {
