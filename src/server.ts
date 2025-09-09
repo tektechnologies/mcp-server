@@ -19,6 +19,19 @@ server.tool("create-user", "Create a new user in the database", {
   email: z.string(),
   address: z.string(), 
   phone: z.string()
+}, {
+  title: "Create User",
+  readOnlyHint: false,
+  destructiveHint: false,
+  idempotentHint: false,
+  openWorldHint: true,
+} async () => {
+  console.log("Creating user");
+  return {
+    success: true,
+    message: "User created successfully"
+  }
+}
 })
 
 async function main() {
