@@ -1,5 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+
 const server = new McpServer({
     name: "mcp-server-and-client",
     version: "2.0.0",
@@ -10,6 +12,14 @@ const server = new McpServer({
         prompts: {},
     },
 });
+
+
+server.tool("create-user", "Create a new user in the database", {
+  name: z.string(),
+  email: z.string(),
+  address: z.string(), 
+  phone: z.string()
+})
 
 async function main() {
   console.log("Server is running");
