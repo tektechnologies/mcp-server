@@ -1,55 +1,88 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { z } from 'zod';
+import fs from 'node:fs/promises';
 
 const server = new McpServer({
-    name: "mcp-server-and-client",
-    version: "2.0.0",
-    description: "A MCP server and client",
-    capabilities: {
-        tools: {},
-        resources: {},
-        prompts: {},
-    },
+  name: 'mcp-server-and-client',
+  version: '2.0.0',
+  description: 'A MCP server and client',
+  capabilities: {
+    tools: {},
+    resources: {},
+    prompts: {},
+  },
 });
 
+server.tool(
+  'create-user',
+  'Create a new user in the database',
+  {
+    name: z.string(),
+    email: z.string(),
+    address: z.string(),
+    phone: z.string(),
+  },
+  {
+    title: 'Create User',
+    readOnlyHint: false,
+    destructiveHint: false,
+    idempotentHint: false,
+    openWorldHint: true,
+  },
+  async (params) => {
+    console.log(params);
+    try {
+      const id = await createUser(params);
 
-server.tool("create-user", "Create a new user in the database", {
-  name: z.string(),
-  email: z.string(),
-  address: z.string(), 
-  phone: z.string()
-}, {
-  title: "Create User",
-  readOnlyHint: false,
-  destructiveHint: false,
-  idempotentHint: false,
-  openWorldHint: true
-}, async (params) => {
-  console.log(params);
-  try {
-    const id = await createUser(params);
-    return {
-      content: [{
-        type: "text",
-        text: `User {$id}created successfully`
-      }]
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `User ${id} created successfully`
+          }
+        ],
+      };
+    } catch {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: 'User creation failed',
+          },
+        ],
+      };
     }
-  } catch {
-    return {
-      content: [{
-        type: "text",
-        text: "User creation failed"
-      }]
-    }
-    }
-})
+  }
+);
+
+async function createUser(user: {
+  name: string;
+  email: string;
+  address: string;
+  phone: string;
+}) {
+  console.log('Creating user', user);
+
+  const usersData = await fs.readFile('./src/data/users.json', 'utf-8');
+  const users = JSON.parse(usersData);
+
+  const id = users.length + 1;
+
+  users.push({
+    id,
+    ...user,
+  });
+
+  await fs.writeFile('./src/data/users.json', JSON.stringify(users, null, 2));
+
+  return id;
+}
 
 async function main() {
-  console.log("Server is running");
+  console.log('Server is running');
   const transport = new StdioServerTransport();
   await server.connect(transport);
-
 }
 
 main();
