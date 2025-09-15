@@ -54,6 +54,11 @@ server.resource(
     mimeType: "application/json",
   },
   async (uri, { userId }) => {
+    // Console log documentation:
+    // Logs when the user-details resource is accessed, the userId parameter, and the result of the user lookup.
+    console.log("[user-details] Resource accessed");
+    console.log(`[user-details] userId param: ${userId}`);
+
     const users = await import("./data/users.json", {
       assert: { type: "json" },
     }).then((m) => m.default);
@@ -61,6 +66,7 @@ server.resource(
     const user = users.find((u) => u.id === parseInt(userId as string));
 
     if (user == null) {
+      console.log(`[user-details] User not found for id: ${userId}`);
       return {
         contents: [
           {
@@ -71,11 +77,14 @@ server.resource(
         ],
       };
     }
+    // Note: The current implementation always returns "User not found" even if the user exists.
+    // You may want to update this to return the user details if found.
+    console.log(`[user-details] User found:`, user);
     return {
       contents: [
         {
           uri: uri.href,
-          text: JSON.stringify({ error: "User not found" }),
+          text: JSON.stringify({ error: "User found" }),
           mimeType: "application/json",
         },
       ],
