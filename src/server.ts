@@ -84,7 +84,7 @@ server.resource(
       contents: [
         {
           uri: uri.href,
-          text: JSON.stringify({ error: "User found" }),
+          text: JSON.stringify(user),
           mimeType: "application/json",
         },
       ],
