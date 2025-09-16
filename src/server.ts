@@ -6,7 +6,6 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import fs from "node:fs/promises";
 import { mime } from "zod/v4";
-import { error } from "node:console";
 
 const server = new McpServer({
   name: "mcp-server-and-client",
@@ -54,11 +53,6 @@ server.resource(
     mimeType: "application/json",
   },
   async (uri, { userId }) => {
-    // Console log documentation:
-    // Logs when the user-details resource is accessed, the userId parameter, and the result of the user lookup.
-    console.log("[user-details] Resource accessed");
-    console.log(`[user-details] userId param: ${userId}`);
-
     const users = await import("./data/users.json", {
       assert: { type: "json" },
     }).then((m) => m.default);
@@ -66,7 +60,6 @@ server.resource(
     const user = users.find((u) => u.id === parseInt(userId as string));
 
     if (user == null) {
-      console.log(`[user-details] User not found for id: ${userId}`);
       return {
         contents: [
           {
@@ -77,9 +70,6 @@ server.resource(
         ],
       };
     }
-    // Note: The current implementation always returns "User not found" even if the user exists.
-    // You may want to update this to return the user details if found.
-    console.log(`[user-details] User found:`, user);
     return {
       contents: [
         {
@@ -109,7 +99,6 @@ server.tool(
     openWorldHint: true,
   },
   async (params) => {
-    console.log(params);
     try {
       const id = await createUser(params);
 
@@ -140,8 +129,6 @@ async function createUser(user: {
   address: string;
   phone: string;
 }) {
-  console.log("Creating user", user);
-
   const usersData = await fs.readFile("./src/data/users.json", "utf-8");
   const users = JSON.parse(usersData);
 
@@ -158,7 +145,6 @@ async function createUser(user: {
 }
 
 async function main() {
-  console.log("Server is running");
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }

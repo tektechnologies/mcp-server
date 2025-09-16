@@ -29,7 +29,7 @@ server.tool('create-user', 'Create a new user in the database', {
     idempotentHint: false,
     openWorldHint: true,
 }, async (params) => {
-    console.log(params);
+    console.error(params);
     try {
         const id = await createUser(params);
         return {
@@ -53,7 +53,7 @@ server.tool('create-user', 'Create a new user in the database', {
     }
 });
 async function createUser(user) {
-    console.log('Creating user', user);
+    console.error('Creating user', user);
     const usersData = await promises_1.default.readFile('./src/data/users.json', 'utf-8');
     const users = JSON.parse(usersData);
     const id = users.length + 1;
@@ -65,7 +65,7 @@ async function createUser(user) {
     return id;
 }
 async function main() {
-    console.log('Server is running');
+    console.error('Server is running');
     const transport = new stdio_js_1.StdioServerTransport();
     await server.connect(transport);
 }
