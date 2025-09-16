@@ -5,7 +5,6 @@ import {
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import fs from "node:fs/promises";
-import { mime } from "zod/v4";
 
 const server = new McpServer({
   name: "mcp-server-and-client",
