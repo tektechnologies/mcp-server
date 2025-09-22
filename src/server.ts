@@ -122,6 +122,10 @@ server.tool(
   }
 );
 
+server.prompt('generate-fake-user', 'Generate a fake user based on a given name', {
+  
+})
+
 async function createUser(user: {
   name: string;
   email: string;
