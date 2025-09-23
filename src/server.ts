@@ -5,6 +5,7 @@ import {
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import fs from "node:fs/promises";
+import { CreateMessageRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 const server = new McpServer({
   name: "mcp-server-and-client",
@@ -121,6 +122,41 @@ server.tool(
     }
   }
 );
+
+server.tool(
+  "create-random-user",
+  "Create a random user with fake data",
+  {
+    title: "Create Random User",
+    readOnlyHint: false,
+    idempotentHint: false,
+    openWorldHint: true,
+  },
+  async () => {
+    const res = await server.server.request(
+      {
+        method; "sampling/createMessage",
+        params: {
+          messages: [
+            {
+              role: "user",
+              content: {
+                type: "text",
+                text: "Generate fake user data. The user should have a realistic name, email, address, and phone number.  Return this data as a JSON object with no other text or formatter so it can be used with JSON.parse.",
+              },
+            },
+          ],
+          maxTokens: 1024,
+        },
+      },
+      CreateMessageRequestSchema
+    )
+    
+  }
+)
+
+
+
 
 server.prompt(
   "generate-fake-user",
