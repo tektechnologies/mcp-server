@@ -151,7 +151,11 @@ server.tool(
       },
       CreateMessageRequestSchema
     )
-    
+    if(res.content.type !== 'text'){
+      return {
+        content: [{type: "text", text: "Failed to genterate user data"}],
+      }
+    }
   }
 )
 
