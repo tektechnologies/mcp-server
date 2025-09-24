@@ -1,4 +1,5 @@
 import { Client } from "@modelcontextprotocol/sdk/client";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 
 
 
@@ -11,3 +12,9 @@ const mcp = new Client(
   },
   { capabilities: {sampling: { } } }
 )
+
+const transport = new StdioClientTransport({
+  command: "node",
+  args: ["build/server.js"],
+  stderr: "ignore",
+})
