@@ -44,7 +44,7 @@ server.resource(
 
 server.resource(
   "user-details",
-  new ResourceTemplate("users://userId}/profile", {
+  new ResourceTemplate("users://{userId}/profile", {
     list: undefined,
   }),
   {
@@ -121,7 +121,7 @@ server.tool(
       };
     }
   }
-);
+)
 
 server.tool(
   "create-random-user",
@@ -129,14 +129,12 @@ server.tool(
   {
     title: "Create Random User",
     readOnlyHint: false,
+    destructiveHint: false,
     idempotentHint: false,
     openWorldHint: true,
   },
   async () => {
-    const res = await server.server.request(
-      {
-        method; "sampling/createMessage",
-        params: {
+    const res = await server.server.request({ method: "sampling/createMessage", params: {
           messages: [
             {
               role: "user",
@@ -149,32 +147,29 @@ server.tool(
           maxTokens: 1024,
         },
       },
-      CreateMessageRequestSchema
+      CreateMessageResultSchema
     )
-    if(res.content.type !== 'text'){
+    
+    if (res.content.type !== "text") {
       return {
-        content: [{type: "text", text: "Failed to genterate user data"}],
+        content: [{ type: "text", text: "Failed to generate user data" }],
       }
     }
-     try{
+    try {
       const fakeUser = JSON.parse(
-        res.content.text
-        .trim()
-        .replace(/^```json/, "")
-        .replace(/```$/, " ")
-        .trim()
+        res.content.text.trim().replace(/^```json/, "").replace(/```$/, "").trim()
       )
-      
-     } catch {
+      const id = await createUser(fakeUser);
       return {
-        content: [{ type: "text", text: "Failed to genterate user data"}],
+        content: [{ type: "text", text: `User ${id} created successfully` }],
       }
-     }
+    } catch {
+      return {
+        content: [{ type: "text", text: "Failed to generate user data" }],
+      }
+    }
   }
 )
-
-
-
 
 server.prompt(
   "generate-fake-user",
