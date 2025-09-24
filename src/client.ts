@@ -18,3 +18,19 @@ const transport = new StdioClientTransport({
   args: ["build/server.js"],
   stderr: "ignore",
 })
+
+async function main() {
+
+  await mcp.connect(transport)
+  Promise.all([
+   mcp.listTools(),
+   mcp.listPrompts(),
+   mcp.listResources(),
+   mcp.listResourceTemplates()
+  ])
+  const { tools } = await mcp.listTools()
+  
+
+}
+
+main()
