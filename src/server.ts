@@ -156,6 +156,20 @@ server.tool(
         content: [{type: "text", text: "Failed to genterate user data"}],
       }
     }
+     try{
+      const fakeUser = JSON.parse(
+        res.content.text
+        .trim()
+        .replace(/^```json/, "")
+        .replace(/```$/, " ")
+        .trim()
+      )
+      
+     } catch {
+      return {
+        content: [{ type: "text", text: "Failed to genterate user data"}],
+      }
+     }
   }
 )
 
