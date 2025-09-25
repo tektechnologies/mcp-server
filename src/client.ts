@@ -112,6 +112,14 @@ async function main() {
 async function handleTool(tool: Tool) {
   console.log(`Using tool: ${tool.name}`);
   // Add tool execution logic here
+  const args: Record<string, string> = {}
+  for( const [key, value] of Object.entries(tool.inputSchema.properties ?? {}))
+  {
+    args[key] = await input({
+      message: `Enter value for %{key} (${(value as {type: string }).type}):`,
+    })
+  }
+  
 }
 
 async function handleResource(uri: string) {
