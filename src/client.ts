@@ -119,7 +119,11 @@ async function handleTool(tool: Tool) {
       message: `Enter value for %{key} (${(value as {type: string }).type}):`,
     })
   }
-  
+  const res = await mcp.callTool({
+    name: tool.name,
+    arguments: args,
+  })
+  console.log((res.content as [{text: string }])[0].text)
 }
 
 async function handleResource(uri: string) {
