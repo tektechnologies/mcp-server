@@ -129,6 +129,9 @@ async function handleTool(tool: Tool) {
 async function handleResource(uri: string) {
   console.log(`Accessing resource: ${uri}`);
   // Add resource handling logic here
+  let finalUri = uri;
+  const paramMatches = uri.match(/{([^}]+)}/g);
+  
 }
 
 async function handlePrompt(prompt: Prompt) {
