@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createGoogleGenerativeAI, google } from "@ai-sdk/google";
 import { confirm, input, select } from "@inquirer/prompts";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
@@ -168,6 +168,19 @@ async function handlePrompt(prompt: Prompt) {
 async function handleServerMessagePrompt(message: PromptMessage) {
   console.log("Query functionality");
   // Add query logic here
+  if(message.content.type !== "text") return
+
+  console.log(message.content.text)
+  const run = await confirm({
+    message: "Would you like to run this prompt?",
+    default: true,  
+  })
+  if(!run) return
+  const {text } = await generateText({
+    model: google("gemini-2.0-flash"),
+    prompt: message.content.text,
+  })
+  return text
 }
 
 main();
