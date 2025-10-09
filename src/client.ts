@@ -150,9 +150,22 @@ async function handleResource(uri: string) {
 async function handlePrompt(prompt: Prompt) {
   console.log(`Using prompt: ${prompt.name}`);
   // Add prompt handling logic here
+  const args: Record<string, string> = {}
+  for(const arg of prompt.arguments ?? []) {
+    args[arg.name] = await input({
+      message: `Enter value for ${arg.name}:`,
+    })
+  }
+  const response = await mcp.getPrompt({
+    name: prompt.name,
+    arguments: args,
+  })
+  for(const message of response.messages) {
+    console.log(await handleServerMessagePrompt(message))
+  }
 }
 
-async function handleQuery(tools: Tool[]) {
+async function handleServerMessagePrompt(message: PromptMessage) {
   console.log("Query functionality");
   // Add query logic here
 }
