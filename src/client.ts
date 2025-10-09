@@ -131,7 +131,16 @@ async function handleResource(uri: string) {
   // Add resource handling logic here
   let finalUri = uri;
   const paramMatches = uri.match(/{([^}]+)}/g);
-  
+
+  if(paramMatches != null) {
+    for(const paramMatch of paramMatches) {
+      const paramName = paramMatch.replace("{", "").replace("}", "")
+      const paramValue = await input({
+        message: `Enter value for ${paramName}:`,
+      })
+      finalUri = finalUri.replace(paramMatch, paramValue)
+    }
+  }
 }
 
 async function handlePrompt(prompt: Prompt) {
