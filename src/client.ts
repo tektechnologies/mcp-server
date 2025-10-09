@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createGoogleGenerativeAI, google } from "@ai-sdk/google";
 import { confirm, input, select } from "@inquirer/prompts";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
@@ -129,16 +129,58 @@ async function handleTool(tool: Tool) {
 async function handleResource(uri: string) {
   console.log(`Accessing resource: ${uri}`);
   // Add resource handling logic here
+  let finalUri = uri;
+  const paramMatches = uri.match(/{([^}]+)}/g);
+
+  if(paramMatches != null) {
+    for(const paramMatch of paramMatches) {
+      const paramName = paramMatch.replace("{", "").replace("}", "")
+      const paramValue = await input({
+        message: `Enter value for ${paramName}:`,
+      })
+      finalUri = finalUri.replace(paramMatch, paramValue)
+    }
+  }
+  const res = await mcp.readResource({
+    uri: finalUri,
+  })
+  console.log(JSON.stringify(JSON.parse(res.contents[0].text as string), null, 2));
 }
 
 async function handlePrompt(prompt: Prompt) {
   console.log(`Using prompt: ${prompt.name}`);
   // Add prompt handling logic here
+  const args: Record<string, string> = {}
+  for(const arg of prompt.arguments ?? []) {
+    args[arg.name] = await input({
+      message: `Enter value for ${arg.name}:`,
+    })
+  }
+  const response = await mcp.getPrompt({
+    name: prompt.name,
+    arguments: args,
+  })
+  for(const message of response.messages) {
+    console.log(await handleServerMessagePrompt(message))
+  }
 }
 
-async function handleQuery(tools: Tool[]) {
+async function handleServerMessagePrompt(message: PromptMessage) {
   console.log("Query functionality");
   // Add query logic here
+  if(message.content.type !== "text") return
+
+  console.log(message.content.text)
+  const run = await confirm({
+    message: "Would you like to run this prompt?",
+    default: true,  
+  })
+  if(!run) return
+  const {text } = await generateText({
+    model: google("gemini-2.0-flash"),
+    prompt: message.content.text,
+  })
+  return text
 }
 
 main();
