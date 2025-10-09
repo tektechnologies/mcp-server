@@ -141,6 +141,10 @@ async function handleResource(uri: string) {
       finalUri = finalUri.replace(paramMatch, paramValue)
     }
   }
+  const res = await mcp.readResource({
+    uri: finalUri,
+  })
+  console.log(JSON.stringify(JSON.parse(res.contents[0].text as string), null, 2));
 }
 
 async function handlePrompt(prompt: Prompt) {
